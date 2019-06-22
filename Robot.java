@@ -27,6 +27,7 @@ public class Robot extends TimedRobot {
   WPI_TalonSRX leftBackMotor = new WPI_TalonSRX(1);
   WPI_TalonSRX rightFrontMotor = new WPI_TalonSRX(2);
   WPI_TalonSRX rightBackMotor = new WPI_TalonSRX(3);
+  WPI_TalonSRX liftMotor = new WPI_TalonSRX(4);
   SpeedControllerGroup left = new SpeedControllerGroup(leftFrontMotor, leftBackMotor);
   SpeedControllerGroup right = new SpeedControllerGroup(rightFrontMotor, rightBackMotor);
 
@@ -34,6 +35,7 @@ public class Robot extends TimedRobot {
       = new DifferentialDrive(left, right);
 
   private final Joystick m_stick = new Joystick(0);
+  Button button1 = new JoystickButton(1);
   private final Timer m_timer = new Timer();
 
   /**
@@ -79,6 +81,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
+    button1.whenPressed();
   }
 
   /**
