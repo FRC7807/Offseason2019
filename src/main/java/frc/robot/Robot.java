@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Joystick.AxisType;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
@@ -27,20 +28,21 @@ public class Robot extends TimedRobot {
 	WPI_TalonSRX leftBackMotor;
 	WPI_TalonSRX rightFrontMotor;
 	WPI_TalonSRX rightBackMotor;
-	WPI_TalonSRX liftMotor;
-	
-	private final DifferentialDrive m_robotDrive;
-		
+
+	WPI_TalonSRX lift;
+	WPI_TalonSRX flywheel;
+
 	SpeedControllerGroup left;
 	SpeedControllerGroup right;
 
-	private final Joystick m_stick;
-	Button button1;
-	private final Timer m_timer;
+	private DifferentialDrive m_robotDrive;
+
+	private Joystick m_stick;
+	private Timer m_timer;
 
 	/**
-	 * This function is run when the robot is first started up and should be
-	 * used for any initialization code.
+	 * This function is run when the robot is first started up and should be used
+	 * for any initialization code.
 	 */
 	@Override
 	public void robotInit() {
@@ -49,15 +51,14 @@ public class Robot extends TimedRobot {
 		rightFrontMotor = new WPI_TalonSRX(2);
 		rightBackMotor = new WPI_TalonSRX(3);
 
-		liftMotor = new WPI_TalonSRX(4);
-
 		left = new SpeedControllerGroup(leftFrontMotor, leftBackMotor);
 		right = new SpeedControllerGroup(rightFrontMotor, rightBackMotor);
-		
-		m_robotDrive = new DifferentialDrive(left, right);
 
+		lift = new WPI_TalonSRX(4);
+		flywheel = new WPI_TalonSRX(5);
+
+		m_robotDrive = new DifferentialDrive(left, right);
 		m_stick = new Joystick(0);
-		button1 = new JoystickButton(1);
 		m_timer = new Timer();
 	}
 
@@ -79,7 +80,7 @@ public class Robot extends TimedRobot {
 		if (m_timer.get() < 2.0) {
 			m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
 		} else {
-			m_robotDrive.stopMotor(); // stop robot
+			teleopPeriodic(); // give robot control to drivers
 		}
 	}
 
@@ -96,6 +97,18 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
+
+		if (m_stick.getPOV() == 0) {
+			lift.set(1);
+		} else if (m_stick.getPOV() == 180) {
+			lift.set(-1);
+		} else {
+			lift.set(0);
+		}
+
+		//TODO: FIX
+		flywheel.set(m_stick.getRawAxis(2));
+		flywheel.set(m_stick.getRawAxis(3));
 	}
 
 	/**
